@@ -107,6 +107,7 @@ def on_message_print(client, userdata, message):
 
     elif message.topic == "GreenhouseControl/greenhouseWater/set":
         payloadDict = yaml.safe_load(message.payload)
+        print(payloadDict)
         if payloadDict["state"] == "ON":
             print("manually turning on watering")
             
