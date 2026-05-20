@@ -1,21 +1,18 @@
 import paho.mqtt.client as mqtt
 import os
 import time
+from ds18b20 import DS18B20
 
-
-sensorDataLocation = "/sys/bus/w1/devices/28-0e2461c86a63/w1_slave"
+sensor = DS18B20()
 updateInterval = 120 #update interval in seconds
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected success")
 
-        with open(sensorDataLocation) as sensorFile:
-            fileContent = sensorFile.read()
-            tempIndicatorLocation = fileContent.find('t=')
-            tempValue = float((fileContent[tempIndicatorLocation+2:]))/1000.0
-            print(tempValue)
-            client.publish("GreenhouseControl/tempSensor01", tempValue, qos=2)
+        tempValue = sensor.get_temperature()
+
+        client.publish("GreenhouseControl/tempSensor01", tempValue, qos=2)
         
     else:
         print(f"Connected fail with code {rc}")
