@@ -20,8 +20,6 @@ def on_connect(client, userdata, flags, rc):
 
 
 while True:
-    time.sleep(updateInterval)
-
     client = mqtt.Client(client_id="GreenhouseControl_tempSensor")
     client.username_pw_set("admin","admin")
     client.on_connect = on_connect
@@ -31,3 +29,4 @@ while True:
     time.sleep(0.5)
     client.loop_stop()
     
+    time.sleep(updateInterval)
