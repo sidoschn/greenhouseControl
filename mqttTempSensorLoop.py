@@ -26,9 +26,9 @@ while True:
     time.sleep(updateInterval)
 
     client = mqtt.Client(client_id="GreenhouseControl_tempSensor")
-    client.username_pw_set("dodo","ds1702")
+    client.username_pw_set("admin","admin")
     client.on_connect = on_connect
-    client.connect("192.168.0.10", 1883, 60)
+    client.connect("192.168.0.54", 1883, 60)
 
     client.loop_start()
     time.sleep(0.5)

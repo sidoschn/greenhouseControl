@@ -159,11 +159,11 @@ initOutputPins(outputPins) # initialize all output pins and set relais to disabl
 
 
 client = mqtt.Client(client_id="GreenhouseControl")
-client.username_pw_set("dodo","ds1702")
+client.username_pw_set("admin","admin")
 client.on_connect = on_connect
 client.on_message = on_message_print
 client.will_set("GreenhouseControl/isAlive", '{"state": "OFF"}', qos=2)
-client.connect("192.168.0.10", 1883, 60)
+client.connect("192.168.0.54", 1883, 60)
 
 deactivateCooling(client)
 deactivateWatering()
