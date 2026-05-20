@@ -4,11 +4,18 @@ import yaml
 import time
 import threading
 
+
 coolingThreshold = 35.0
 coolingRelaisChannel = 2
 coolingTime = 60
 freezeWarnThreshold = 5.0
 greenhouseWateringChannel = 1
+fieldWateringChannel = 3
+
+baseTopic = "GreenhouseControl"
+greenHouseWateringTopic = "greenhouseWater"
+coolingTopic = "coolingStatus"
+fieldWaterTopic = "fieldWater"
 
 # dictionary of available output (relais) pins
 outputPins = {
@@ -21,6 +28,8 @@ outputPins = {
     7:'21',
     8:'26'
 }
+
+
 
 
 # The callback function. It will be triggered when trying to connect to the MQTT broker
@@ -100,21 +109,22 @@ def on_message_print(client, userdata, message):
         payloadDict = yaml.safe_load(message.payload)
         if payloadDict["state"] == "ON":
             print("manually turning on watering")
-            activateWatering()
+            
+            activateWatering(client)
             
         elif payloadDict["state"] == "OFF":
             print("manually turning off watering")
-            deactivateWatering()
+            deactivateWatering(client)
 
     elif message.topic == "GreenhouseControl/fieldWater/set":
         payloadDict = yaml.safe_load(message.payload)
         if payloadDict["state"] == "ON":
             print("manually turning on field watering")
-            activateFieldWatering()
+            activateFieldWatering(client)
             
         elif payloadDict["state"] == "OFF":
             print("manually turning off field watering")
-            deactivateFieldWatering()
+            deactivateFieldWatering(client)
                         
     elif message.topic == "GreenhouseControl/isAlive/set":
         client.publish("GreenhouseControl/isAlive", '{"state": "OFF"}', qos=2)
@@ -122,33 +132,55 @@ def on_message_print(client, userdata, message):
         
 
 def activateCooling(client):
-    os.system('pinctrl '+outputPins[coolingRelaisChannel]+' dl')
-    os.system('pinctrl '+outputPins[coolingRelaisChannel])
-    client.publish("GreenhouseControl/coolingStatus", '{"state": "ON"}', qos=2)
+    # os.system('pinctrl '+outputPins[coolingRelaisChannel]+' dl')
+    # os.system('pinctrl '+outputPins[coolingRelaisChannel])
+    # client.publish("GreenhouseControl/coolingStatus", '{"state": "ON"}', qos=2)
+    switchRelais(coolingRelaisChannel,coolingTopic,"on",client)
 
 def deactivateCooling(client):
-    os.system('pinctrl '+outputPins[coolingRelaisChannel]+' dh')
-    os.system('pinctrl '+outputPins[coolingRelaisChannel])
-    client.publish("GreenhouseControl/coolingStatus", '{"state": "OFF"}', qos=2)
+    # os.system('pinctrl '+outputPins[coolingRelaisChannel]+' dh')
+    # os.system('pinctrl '+outputPins[coolingRelaisChannel])
+    # client.publish("GreenhouseControl/coolingStatus", '{"state": "OFF"}', qos=2)
+    switchRelais(coolingRelaisChannel,coolingTopic,"off",client)
 
-def activateWatering():
-    os.system('/usr/bin/python /home/admin/pythonScripts/mqttGreenhouseWater.py on')
+def activateWatering(client):
+    #os.system('/usr/bin/python /home/admin/pythonScripts/mqttGreenhouseWater.py on')
+    switchRelais(greenhouseWateringChannel,greenHouseWateringTopic,"on",client)
 
-def deactivateWatering():
-    os.system('/usr/bin/python /home/admin/pythonScripts/mqttGreenhouseWater.py off')
+def deactivateWatering(client):
+    #os.system('/usr/bin/python /home/admin/pythonScripts/mqttGreenhouseWater.py off')
+    switchRelais(greenhouseWateringChannel,greenHouseWateringTopic,"off",client)
 
-def activateFieldWatering():
-    os.system('/usr/bin/python /home/admin/pythonScripts/mqttFieldWater.py on')
+def activateFieldWatering(client):
+    #os.system('/usr/bin/python /home/admin/pythonScripts/mqttFieldWater.py on')
+    switchRelais(fieldWateringChannel,fieldWaterTopic,"on",client)
 
-def deactivateFieldWatering():
-    os.system('/usr/bin/python /home/admin/pythonScripts/mqttFieldWater.py off')
+def deactivateFieldWatering(client):
+    #os.system('/usr/bin/python /home/admin/pythonScripts/mqttFieldWater.py off')
+    switchRelais(fieldWateringChannel,fieldWaterTopic,"off",client)
 
 
-def timedCoolingShutdown(client):
-    time.sleep(coolingTime)
-    print("Cooling for "+str(coolingTime)+" seconds")
-    deactivateCooling(client)
-    print("Done cooling")
+def switchRelais(pinChannel, pinChannelName, bEnable, client):
+     
+    if bEnable == "on":
+        os.system('pinctrl '+outputPins[pinChannel]+' dl')
+        print("Started watering")
+        client.publish("GreenhouseControl/"+pinChannelName, '{"state": "ON"}', qos=2)
+    elif bEnable == "off":
+        os.system('pinctrl '+outputPins[pinChannel]+' dh')
+        print("Stopped watering")
+        client.publish("GreenhouseControl/"+pinChannelName, '{"state": "OFF"}', qos=2)
+    else:
+        os.system('pinctrl '+outputPins[pinChannel])
+
+
+
+
+# def timedCoolingShutdown(client):
+#     time.sleep(coolingTime)
+#     print("Cooling for "+str(coolingTime)+" seconds")
+#     deactivateCooling(client)
+#     print("Done cooling")
 
 def initOutputPins(pinDict):
     for outPin in pinDict.values():
@@ -166,9 +198,9 @@ client.will_set("GreenhouseControl/isAlive", '{"state": "OFF"}', qos=2)
 client.connect("192.168.0.54", 1883, 60)
 
 deactivateCooling(client)
-deactivateWatering()
-deactivateFieldWatering()
+deactivateWatering(client)
+deactivateFieldWatering(client)
 
-timedCoolingThread = threading.Thread(target=timedCoolingShutdown, args=(client,), daemon=True)
+#timedCoolingThread = threading.Thread(target=timedCoolingShutdown, args=(client,), daemon=True)
 
 client.loop_forever()
