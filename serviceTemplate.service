@@ -1,0 +1,15 @@
+[Unit]
+Description=Temperature control
+After=syslog.target network-online.target
+
+[Service]
+SyslogIdentifier=growsrv
+User=admin
+ExecStart=/usr/bin/perl /home/admin/pythonScripts/mqttTempControlSystem.py
+StandardOutput=syslog
+Restart=on-failure
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

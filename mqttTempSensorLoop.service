@@ -1,0 +1,15 @@
+[Unit]
+Description=Temperature sensor loop
+After=syslog.target network-online.target
+
+[Service]
+SyslogIdentifier=tempsensloop
+User=admin
+ExecStart=/usr/bin/python /home/admin/pythonScripts/mqttTempSensorLoop.py
+StandardOutput=syslog
+Restart=on-failure
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
