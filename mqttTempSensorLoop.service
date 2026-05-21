@@ -5,7 +5,7 @@ After=syslog.target network-online.target
 [Service]
 SyslogIdentifier=tempsensloop
 User=admin
-ExecStart=/usr/bin/python /home/admin/pythonScripts/mqttTempSensorLoop.py
+ExecStart=/usr/bin/python /home/admin/greenhouseControl/mqttTempSensorLoop.py
 StandardOutput=syslog
 Restart=on-failure
 RestartSec=10

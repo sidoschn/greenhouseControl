@@ -74,7 +74,7 @@ def on_message_print(client, userdata, message):
             print("It is too hot")
             activateCooling(client)
             client.publish("GreenhouseControl/lastReceivedTemp", payloadValue, qos=2)
-            timedCoolingThread.start()
+            #timedCoolingThread.start()
             
         elif payloadValue<freezeWarnThreshold:
             print("It is too cold")
@@ -107,7 +107,6 @@ def on_message_print(client, userdata, message):
 
     elif message.topic == "GreenhouseControl/greenhouseWater/set":
         payloadDict = yaml.safe_load(message.payload)
-        print(payloadDict)
         if payloadDict["state"] == "ON":
             print("manually turning on watering")
             
