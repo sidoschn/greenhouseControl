@@ -2,8 +2,8 @@ import subprocess
 import time
 
 def performAutoupdate():
-    currentHash = subprocess.check_output("git rev-parse HEAD", shell=True,text=True)
-    print("Running auto-update, current version is: "+ currentHash ) #show hash to identify git repo version
+    # currentHash = subprocess.check_output("git rev-parse HEAD", shell=True,text=True)
+    # print("Running auto-update, current version is: "+ currentHash ) #show hash to identify git repo version
     #pullResult = os.system("git pull")
     pullResult = "cannot resolve git link"
     pullAttempt = 0
