@@ -3,7 +3,9 @@ import os
 import yaml
 import time
 import threading
+import autoUpdate as updater
 
+updater.performAutoupdate()
 
 coolingThreshold = 35.0
 coolingRelaisChannel = 2
