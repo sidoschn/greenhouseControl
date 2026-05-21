@@ -5,7 +5,8 @@ After=syslog.target network-online.target
 [Service]
 SyslogIdentifier=growsrv
 User=admin
-ExecStart=/usr/bin/perl /home/admin/pythonScripts/mqttTempControlSystem.py
+WorkingDirectory=/home/admin/greenhouseControl
+ExecStart=/usr/bin/perl /home/admin/greenhouseControl/mqttTempControlSystem.py
 StandardOutput=syslog
 Restart=on-failure
 RestartSec=10
